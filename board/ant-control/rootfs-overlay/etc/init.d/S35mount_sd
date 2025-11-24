@@ -1,0 +1,30 @@
+#!/bin/sh
+
+### STARTUP SCRIPT TO MOUNT SD CARD BEFORE ANY NETWORK SERVICE ###
+mkdir -p /mnt/sd
+# Wait for SD device
+echo "[mount_sd] Waiting for /dev/mmcblk0p1..."
+COUNT=0
+while [ ! -e /dev/mmcblk0p1 ] && [ $COUNT -lt 10 ]; do
+    sleep 1
+    COUNT=$((COUNT+1))
+done
+
+if [ ! -e /dev/mmcblk0p1 ]; then
+    echo "[mount_sd] ERROR: SD device not found."
+    exit 1
+fi
+
+# Try mounting
+echo "[mount_sd] Mounting /dev/mmcblk0p1 to /mnt/sd ..."
+mount /mnt/sd 2>/dev/null
+
+if mount | grep -q "/mnt/sd"; then
+    echo "[mount_sd] SD mounted OK."
+else
+    echo "[mount_sd] ERROR: Failed to mount SD."
+    exit 1
+fi
+
+exit 0
+
